@@ -1,0 +1,12 @@
+{
+  "plugins": [
+    {
+      "name": "cortex-ui-extras",
+      "source": "./plugins/cortex-ui-extras"
+    },
+    {
+      "name": "cortex-pr-review",
+      "source": "./plugins/cortex-pr-review"
+    }
+  ]
+}

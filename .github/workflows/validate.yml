@@ -1,0 +1,33 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Validate cortex-ui-extras skills
+        run: python3 scripts/validate-skill.py plugins/cortex-ui-extras/skills
+
+      - name: Validate cortex-pr-review skills
+        run: python3 scripts/validate-skill.py plugins/cortex-pr-review/skills
+
+      - name: Probe guard — no hardcoded ~/.claude/skills/ui- paths in ui-check
+        run: |
+          if grep -r '~/.claude/skills/ui-' plugins/cortex-ui-extras/skills/ui-check/SKILL.md; then
+            echo "ERROR: found hardcoded ~/.claude/skills/ui- reference in ui-check/SKILL.md"
+            exit 1
+          fi
