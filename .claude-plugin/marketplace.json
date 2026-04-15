@@ -1,4 +1,9 @@
 {
+  "name": "cortex-command-plugins",
+  "owner": {
+    "name": "charleshall888",
+    "email": "charliemhall@gmail.com"
+  },
   "plugins": [
     {
       "name": "cortex-ui-extras",
