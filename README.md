@@ -6,6 +6,7 @@ Optional Claude Code plugins that complement the [cortex-command](https://github
 
 - **cortex-ui-extras** — UI-focused skills for working on frontend/dashboard code (see the UI tooling reference at `docs/ui-tooling.md` in `cortex-command` for the underlying conventions).
 - **cortex-pr-review** — Skill for reviewing GitHub pull requests.
+- **android-dev-extras** — Personal Android-development skills vendored from [github.com/android/skills](https://github.com/android/skills) (Apache 2.0). See [plugins/android-dev-extras/HOW-TO-SYNC.md](plugins/android-dev-extras/HOW-TO-SYNC.md) for refresh procedure.
 
 ## Relationship to cortex-command
 
