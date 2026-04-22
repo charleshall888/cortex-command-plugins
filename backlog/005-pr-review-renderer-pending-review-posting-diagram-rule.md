@@ -25,17 +25,19 @@ See `research/pr-review-skill-improvements/research.md` — Question 3 (GitHub c
 
 New renderer stage in `plugins/cortex-pr-review/skills/pr-review/references/protocol.md` after the synthesizer:
 
-- Converts synthesizer's labeled findings into the GitHub review payload: `commit_id` (fresh `headRefOid`), `body` (summary with footer), `event` (default `PENDING`), `comments[]` with `path`/`line`/`start_line`/`side`/`start_side`/`body`.
+- Converts synthesizer's labeled findings into the GitHub review payload: `commit_id` (fresh `headRefOid`), `body` (walkthrough + summary + footer, see below), `event` (default `PENDING`), `comments[]` with `path`/`line`/`start_line`/`side`/`start_side`/`body`.
 - `suggestion` blocks used only when the suggestion fully fixes the issue (per Anthropic's pattern); 4+ backtick outer fence for nested code blocks.
-- Diagram decision rule embedded in renderer prompt: emit a mermaid diagram only when severity ≥ should-fix AND one of the structural triggers fires (cross-file flow, state machine change, concurrency sequencing, ≥ 3-site refactor, non-trivial type hierarchy change). Explicit exclusions for PR overviews, renames, single-function bugs, naming nits.
+- **Fuzzy line-number anchoring**: the renderer does NOT trust the synthesizer's line number. Instead it matches the finding's `evidence.quoted_text` against the diff hunk and snaps to the actual line where that text appears. Eliminates a class of 422 out-of-hunk errors that Ellipsis publicly flagged as a known LLM failure mode ("LLMs are notoriously bad at correctly identifying column numbers and often off-by-one on line numbers"). If the quote doesn't match any line in the hunk, the renderer demotes the finding to the review body with a note, rather than posting to the wrong line.
+- **Walkthrough body format** (CodeRabbit pattern): review `body` contains (1) one-line verdict + footer counts, (2) collapsed `<details>` walkthrough — file-by-file one-liner summary of what changed, (3) optional mermaid diagram if the diagram rule triggers, (4) the synthesizer's observability footer with dropped findings. Gives the reviewer one-screen orientation before opening the inline comments.
+- Diagram decision rule embedded in renderer prompt: emit a mermaid diagram only when severity ≥ should-fix AND one of the structural triggers fires (cross-file flow, state machine change, concurrency sequencing, ≥ 3-site refactor, non-trivial type hierarchy change). Explicit exclusions for PR overviews, renames, single-function bugs, naming nits. Diagram goes in the body walkthrough, not an inline comment.
 - Posting path: `gh api POST /repos/{o}/{r}/pulls/{n}/reviews --input payload.json` with `event=PENDING`. `--submit` flag switches `event` to `COMMENT` / `APPROVE` / `REQUEST_CHANGES`.
-- Terminal output after posting: one-line summary (`Posted 5 comments as pending review — open PR to edit/submit: <URL>`) plus the observability footer.
-- Graceful fallback: if posting fails (auth, out-of-hunk 422, stale `commit_id`), emit paste-ready markdown with explicit drag-select instructions for multi-line comments — this is the fallback path only, not the default.
+- Terminal output after posting: one-line summary (`Posted 5 comments as pending review, open PR to edit/submit: <URL>`) plus the observability footer.
+- Graceful fallback: if posting fails (auth, out-of-hunk 422, stale `commit_id`), emit paste-ready markdown with explicit drag-select instructions for multi-line comments. This is the fallback path only, not the default.
 
 Updates `SKILL.md` description and `argument-hint` to reflect `--submit` flag. Adds a `--paste` flag for users who prefer the old paste-ready behavior on demand.
 
 ## Out of scope
 
-- Voice post-filter pass — ticket 007. (Rendered text is handed to the voice filter before posting.)
-- Haiku early-exit gate — ticket 008.
-- Corpus-based voice transfer — deferred per epic.
+- Voice post-filter pass — next ticket (006). Rendered text is handed to the voice filter before posting.
+- Risk-tiered agent count, diff pre-filter upstream of critics, learned-rules loop, circuit-breaker model failback — epic-level follow-ups surfaced from commercial-tool research, not in this ticket.
+- Corpus-based voice transfer — epic-level follow-up.

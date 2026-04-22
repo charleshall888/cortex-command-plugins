@@ -36,25 +36,44 @@ Two new reference files plus a rewrite of Stage 4 of the protocol — shipped to
 
 - Three-axis scoring rubric:
   - Severity: `must-fix` / `should-fix` / `nit` / `unknown`.
-  - Solidness: `solid` / `plausible` / `thin`.
+  - Solidness: `solid` / `plausible` / `thin`. **`solid` requires the finding to name the concrete next action the author should take** (actionability baked into the definition, per CodeRabbit's "actionable" judge metric).
   - Signal: `high` / `medium` / `low`.
 - Gate thresholds per finding type with worked examples on real PR findings.
 - `cross-cutting:` and `praise:` finding types with their own gate rules (bypass locality for cross-cutting; gated by `solidness=solid AND signal=high` for both).
 - Nit cap (3 per review) with deterministic tie-break (file path alphabetical, then line ascending).
-- Drop-reason taxonomy for the observability footer (`unanchored`, `low-signal`, `linter-class`, `over-cap`).
+- Drop-reason taxonomy for the observability footer (`unanchored`, `low-signal`, `linter-class`, `over-cap`, `evidence-mismatch`).
 
 ### New reference: `references/output-format.md`
 
 Conventional Comments label taxonomy (`issue:`, `suggestion:`, `nit:`, `question:`, `praise:`, `cross-cutting:`) with `(blocking)`/`(non-blocking)` decorators. Voice guide (no em-dashes, no AI-tell vocabulary, no validation openers, no closing fluff). Note: suggestion-block syntax and line-anchoring rules belong in the renderer ticket since they're renderer concerns, not synthesizer concerns.
 
+### Critic output schema (upstream contract the synthesizer relies on)
+
+Each of the four parallel critic agents must return findings as structured objects with a required `evidence` field:
+
+```
+finding: {
+  claim: "one-sentence statement of the problem",
+  evidence: {
+    path: "src/foo.ts",
+    line_range: [42, 45],
+    quoted_text: "exact text from the diff, character-for-character"
+  },
+  suggested_fix: "short description of the fix, or null",
+  category: "bug" | "compliance" | "history" | "historical-comment"
+}
+```
+
+The synthesizer deterministically rejects any finding whose `evidence.quoted_text` doesn't appear literally in the diff. This is a hard check against hallucinated evidence (Ellipsis's Comment Generator pattern; addresses CriticGPT's failure mode more tightly than prose-level "must quote lines" instructions).
+
 ### Rewrite: Stage 4 of `references/protocol.md`
 
 - Synthesizer subagent pinned to `model: claude-opus-4-7`.
 - Receives full diff, all CLAUDE.mds, and all four critic outputs in one context (1M window).
-- Applies evidence-grounding check first: each finding must quote offending lines; unanchored findings dropped.
+- **Evidence-grounding check first**: for each finding, verify `evidence.quoted_text` appears verbatim in the diff. Drop with reason `evidence-mismatch` if not.
 - Applies the rubric to score each surviving finding against severity / solidness / signal.
 - Emits output as a structured list of labeled findings per Conventional Comments format — no fixed Architectural Assessment / Consensus Positives sections.
-- Emits observability footer: `N considered, X surfaced, Y dropped (Y1 unanchored, Y2 low-signal, Y3 linter-class, Y4 over-cap)`.
+- **Observability footer**: `N considered, X surfaced, Y dropped (Y1 unanchored, Y2 low-signal, Y3 linter-class, Y4 over-cap, Y5 evidence-mismatch)` **plus a collapsed `<details>` block listing each dropped finding with its drop reason** (Ellipsis's transparency pattern — counts alone don't build trust; the specific drops do).
 - Removes scaffolding language ("double-check before returning") that Opus 4.7's literal instruction-following makes unnecessary.
 - Existing synthesis-failure fallback preserved (present raw Sonnet outputs with explanation).
 

@@ -35,8 +35,21 @@ Full research artifact: `research/pr-review-skill-improvements/research.md`. Key
 - **DR-4**: Voice enforcement via deterministic post-filter + targeted sentence regeneration, not prompt-only.
 - **DR-5**: Default posting path is `gh api` with `event=PENDING` (pending review, author-only, editable in GitHub UI). Paste-ready is the fallback when posting fails.
 
-## Out of scope
+## Out of scope (future follow-ups)
+
+Deferred items — worth tracking but not on this epic's critical path.
 
 - Example-based voice transfer using a corpus of user-written review comments (tracked as a Stage 4 enhancement once corpus exists).
 - CI-mode invocation with rate-limiting concerns (deferred unless confirmed).
 - Preserving the `APPROVE | REQUEST CHANGES | REJECT` verdict keyword for back-compat with external scripts (confirm whether any exist before shipping).
+
+### Surfaced by commercial-tool research (Bugbot, CodeRabbit, Ellipsis, Cloudflare, Greptile, Sourcery)
+
+- **Risk-tiered agent count** (Cloudflare). Scale critic count by diff size: 2 agents for trivial, 4 for lite, full set for large or security-sensitive PRs. Current pipeline runs 4 regardless.
+- **Upstream diff pre-filter** (Cloudflare). Strip lock files, vendored deps, minified assets, `@generated` files before they reach any critic. Current Stage 2 Haiku classifies them as `skim-ignore` but still ships the full diff to critics.
+- **Named "explicitly out-of-scope" block in each critic's prompt** (Cloudflare). Do-not-flag list surfaced as a visible prompt section per critic, not buried in protocol.
+- **Learned-rules feedback loop** (Bugbot, Greptile). Ingest user reactions on merged reviews to tune subsequent rubric weights. Requires persistence model; out of scope for initial redesign.
+- **Agentic context-pulling** (Bugbot V2). Allow the bug/logic critic to request additional file reads within a budget, instead of a fixed context bundle. Big unpredictability shift; consider later.
+- **Circuit-breaker model failback** (Cloudflare). On 429/503 from Opus 4.7, fail back to Sonnet instead of bombing the whole review.
+- **Resolution-rate metric as ship-gate** (Bugbot). Post-review audit: of findings surfaced, how many led to changes in the merged diff? Richer than the current label-consistency ship gate.
+- **Coordinator-level model config** (Cloudflare). Externalize model pins (Opus/Sonnet/Haiku slots) to a config file so swaps don't require editing protocol.md.
