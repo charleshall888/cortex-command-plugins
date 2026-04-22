@@ -54,7 +54,7 @@ Sequence guard-mechanism verification (on a representative plugin-loader substra
 - **Complexity**: simple
 - **Context**: Re-read HOW-TO-SYNC.md before editing — line numbers from the spec/research are pre-edit orientation only and drift with each task. Anchor edits on heading text (`## Upstream source`) and the opening intro paragraph, not numeric offsets. Heading text MUST be exactly `## Why this plugin exists` (Req 1 AC: `grep -c "^## Why this plugin exists"` = 1). Must include `per-project-toggle` or `per-project-togglable` ≥ 1, and `non-destructive` or `curation bar` ≥ 1. Marketplace README is at repo root; reference as "see marketplace README."
 - **Verification**: (a) `grep -c "^## Why this plugin exists" plugins/android-dev-extras/HOW-TO-SYNC.md` = 1; (b) `grep -Ec "per-project[ -]toggle|per-project-togglable" plugins/android-dev-extras/HOW-TO-SYNC.md` — pass if count ≥ 1; (c) `grep -Ec "non-destructive|curation bar" plugins/android-dev-extras/HOW-TO-SYNC.md` — pass if count ≥ 1
-- **Status**: [ ] pending
+- **Status**: [x] completed
 
 ### Task 6: Rewrite `## Upstream source` for dual upstream + fallback
 
@@ -63,8 +63,8 @@ Sequence guard-mechanism verification (on a representative plugin-loader substra
 - **Depends on**: [5]
 - **Complexity**: simple
 - **Context**: Re-read HOW-TO-SYNC.md before editing. Anchor: heading `## Upstream source` (its location has shifted since Task 5 added the preamble — do NOT rely on pre-edit line numbers from the spec/research). Target body is the region between `## Upstream source` and the next `##` heading. AC 2c requires a line within the section matching `authoritative|primary|source of truth` (case-insensitive); AC 2d requires `undocumented|fallback|if.*unreachable|release zip`.
-- **Verification**: (a) `grep -c dl.google.com/dac/dac_skills.zip plugins/android-dev-extras/HOW-TO-SYNC.md` — pass if count ≥ 1; (b) `grep -c github.com/android/skills plugins/android-dev-extras/HOW-TO-SYNC.md` — pass if count ≥ 1; (c) `awk '/^## Upstream source$/,/^## /' plugins/android-dev-extras/HOW-TO-SYNC.md | grep -Ei "authoritative|primary|source of truth"` — pass if exit 0; (d) `grep -Ei "undocumented|fallback|if.*unreachable|release zip" plugins/android-dev-extras/HOW-TO-SYNC.md` — pass if exit 0
-- **Status**: [ ] pending
+- **Verification**: (a) `grep -c dl.google.com/dac/dac_skills.zip plugins/android-dev-extras/HOW-TO-SYNC.md` — pass if count ≥ 1; (b) `grep -c github.com/android/skills plugins/android-dev-extras/HOW-TO-SYNC.md` — pass if count ≥ 1; (c) `awk '/^## Upstream source$/{flag=1; next} /^## /{flag=0} flag' plugins/android-dev-extras/HOW-TO-SYNC.md | grep -Ei "authoritative|primary|source of truth"` — pass if exit 0 (corrected awk — spec's original `/^X$/,/^## /` pattern closes on open-line match); (d) `grep -Ei "undocumented|fallback|if.*unreachable|release zip" plugins/android-dev-extras/HOW-TO-SYNC.md` — pass if exit 0
+- **Status**: [x] completed
 
 ### Task 7: Restructure Curation section into 3 subsections + populate Covered skills (bare listings)
 
@@ -73,8 +73,8 @@ Sequence guard-mechanism verification (on a representative plugin-loader substra
 - **Depends on**: [6]
 - **Complexity**: simple
 - **Context**: Re-read HOW-TO-SYNC.md before editing. Anchor on the parent heading `## Curation decisions worth revisiting` (preserved as-is per the spec's "replaced with an equivalent heading" wording — see Veto Surface if the user prefers a reworded parent). Subsection order is normative AND verified (AC g, below). Existing deferral rationale text must be preserved byte-identically except for indentation.
-- **Verification**: (a) `grep -c "^### Covered skills$" plugins/android-dev-extras/HOW-TO-SYNC.md` = 1; (b) `grep -c "^### Accepted divergences$" plugins/android-dev-extras/HOW-TO-SYNC.md` = 1; (c) `grep -c "^### Deferred candidates$" plugins/android-dev-extras/HOW-TO-SYNC.md` = 1; (d) `awk '/^### Deferred candidates$/,0' plugins/android-dev-extras/HOW-TO-SYNC.md | grep -Ec "agp-9-upgrade|migrate-xml-views-to-jetpack-compose|navigation-3|play-billing-library-version-upgrade"` — pass if count = 4; (e) `awk '/^### Covered skills$/,/^### /' plugins/android-dev-extras/HOW-TO-SYNC.md | grep -c android-cli` — pass if count ≥ 1; (f) `awk '/^### Covered skills$/,/^### /' plugins/android-dev-extras/HOW-TO-SYNC.md | grep -Ec "r8-analyzer|edge-to-edge"` — pass if count ≥ 2; (g) sibling-order check: `diff <(grep -E "^### (Covered skills|Accepted divergences|Deferred candidates)" plugins/android-dev-extras/HOW-TO-SYNC.md) <(printf '### Covered skills\n### Accepted divergences\n### Deferred candidates\n')` — pass if exit 0 and no output (subsections appear in normative order)
-- **Status**: [ ] pending
+- **Verification**: (a) `grep -c "^### Covered skills$" plugins/android-dev-extras/HOW-TO-SYNC.md` = 1; (b) `grep -c "^### Accepted divergences$" plugins/android-dev-extras/HOW-TO-SYNC.md` = 1; (c) `grep -c "^### Deferred candidates$" plugins/android-dev-extras/HOW-TO-SYNC.md` = 1; (d) `awk '/^### Deferred candidates$/,0' plugins/android-dev-extras/HOW-TO-SYNC.md | grep -Ec "agp-9-upgrade|migrate-xml-views-to-jetpack-compose|navigation-3|play-billing-library-version-upgrade"` — pass if count = 4; (e) `awk '/^### Covered skills$/{flag=1; next} /^### /{flag=0} flag' plugins/android-dev-extras/HOW-TO-SYNC.md | grep -c android-cli` — pass if count ≥ 1 (corrected awk pattern); (f) `awk '/^### Covered skills$/{flag=1; next} /^### /{flag=0} flag' plugins/android-dev-extras/HOW-TO-SYNC.md | grep -Ec "r8-analyzer|edge-to-edge"` — pass if count ≥ 2; (g) sibling-order check: `diff <(grep -E "^### (Covered skills|Accepted divergences|Deferred candidates)" plugins/android-dev-extras/HOW-TO-SYNC.md) <(printf '### Covered skills\n### Accepted divergences\n### Deferred candidates\n')` — pass if exit 0 and no output (subsections appear in normative order)
+- **Status**: [x] completed
 
 ### Task 8: Populate `### Accepted divergences` with android-cli entry + add Covered-skills cross-reference
 
