@@ -9,7 +9,7 @@ tags: [pr-review-skill-improvements]
 created: 2026-04-22
 updated: 2026-04-22
 parent: 3
-blocked-by: [5]
+blocked-by: [4]
 discovery_source: research/pr-review-skill-improvements/research.md
 ---
 

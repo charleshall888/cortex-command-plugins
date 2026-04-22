@@ -17,13 +17,13 @@ The current `/pr-review` skill surfaces too many findings that don't survive a "
 
 ## Scope
 
-Five child tickets covering the staged rollout from DR-1:
+Three child tickets covering the staged rollout from DR-1:
 
-1. Three-axis rubric + output-format references (`references/rubric.md`, `references/output-format.md`) with Conventional Comments taxonomy.
-2. Single-pass Opus 4.7 synthesizer that collapses precision validation + rubric scoring + filtering into one stage with an observability footer.
-3. Renderer + pending-review posting via `gh api POST /pulls/{n}/reviews` with `event=PENDING` default; paste-ready fallback; diagram decision rule.
-4. Voice post-filter: deterministic em-dash strip + targeted sentence regeneration on AI-tell vocabulary.
-5. Haiku early-exit gate: skip drafts, closed PRs, already-reviewed PRs before triage.
+1. **Synthesis stage rewrite with three-axis rubric and Conventional Comments output format.** New `references/rubric.md` and `references/output-format.md` plus Stage 4 rewrite. Ship-gated on a rubric stability test (≥ 90% label consistency across 3 PRs × 3 runs).
+2. **Renderer, pending-review posting, and diagram decision rule.** Converts synthesizer output to `gh api POST /pulls/{n}/reviews` with `event=PENDING` default; paste-ready fallback when posting fails; diagram triggers in the renderer prompt.
+3. **Voice post-filter.** Deterministic em-dash strip + targeted sentence regeneration on AI-tell vocabulary. Calibrated to ≤ 5% false-positive rate on prior human-written comments.
+
+Haiku early-exit gate (from DR-1 Stage 1 in the first decomposition) was dropped in consolidation review — the optimization's value doesn't justify its own ticket. Rubric + synthesizer combined into one ticket because the rubric has no standalone validation path without the synthesizer that applies it.
 
 ## Research context
 

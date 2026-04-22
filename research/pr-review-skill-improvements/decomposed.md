@@ -8,17 +8,13 @@
 
 | ID | Title | Priority | Size | Depends On |
 |----|-------|----------|------|------------|
-| 004 | Add pr-review three-axis rubric and output-format references | high | M | — |
-| 005 | Rewrite pr-review synthesis stage: Opus 4.7, integrated precision + rubric, observability footer | high | M | 004 |
-| 006 | Add pr-review renderer, pending-review posting via gh api, and diagram decision rule | high | M | 005 |
-| 007 | Add pr-review voice post-filter: em-dash strip and AI-tell sentence regeneration | medium | S | 006 |
-| 008 | Add pr-review Haiku early-exit gate for drafts, closed PRs, and already-reviewed PRs | low | S | — |
+| 004 | Rewrite pr-review synthesis stage with three-axis rubric and Conventional Comments output format | high | M-L | — |
+| 005 | Add pr-review renderer, pending-review posting via gh api, and diagram decision rule | high | M | 004 |
+| 006 | Add pr-review voice post-filter: em-dash strip and AI-tell sentence regeneration | medium | S | 005 |
 
 ## Suggested Implementation Order
 
-Linear chain for the core redesign: 004 → 005 → 006 → 007. Each stage is independently testable and delivers incremental value — 004 ships rubric documentation that can be calibrated before the synthesizer adopts it; 005 gets the filtering improvement visible in terminal output; 006 adds the pending-review posting workflow; 007 applies voice discipline to the posted text.
-
-Ticket 008 (Haiku early-exit gate) has no dependencies on the core chain and can run in parallel any time.
+Linear chain: 004 → 005 → 006. Each stage is independently testable and delivers incremental user-visible value. 004 gets filtering into terminal output and addresses complaints (1), (3), (4). 005 adds the pending-review posting workflow and addresses (2) and (5). 006 applies voice discipline to posted text and addresses (6).
 
 ## Key Design Decisions
 
@@ -32,14 +28,14 @@ From research DR-1 through DR-5:
 
 ## Consolidation Notes
 
-- Diagram decision rule (DR-1 Stage 5) merged into ticket 006 (Stage 3 renderer) — the rule is one prompt addition to the renderer, no standalone deliverable value. Rationale: (b) no-standalone-value prerequisite.
-- No other consolidations — each remaining ticket maps to a distinct artifact and a discrete testable increment.
+- **Rubric + synthesizer merged into ticket 004.** The rubric had no standalone validation path — its ship gate (≥ 90% label consistency across 3 PRs × 3 runs) requires the synthesizer to exist. Separating them was a decomposition cheat. Combined into one M-L ticket per signal (b) no-standalone-value prerequisite.
+- **Haiku early-exit gate dropped.** Optimization independent of the filtering/posting rework; user confirmed the value didn't justify a ticket.
+- **Diagram decision rule merged into ticket 005.** The rule is one prompt addition to the renderer, no standalone deliverable value. Rationale: (b) no-standalone-value prerequisite.
+- **Voice filter (006) kept separate from renderer (005).** Voice filter is small and self-contained: one new reference file plus one pass stage. Bundling would have bloated 005 without simplifying. Clean seam at "rendered text → filtered text → posted review."
 
 ## Created Files
 
 - `backlog/003-redesign-pr-review-skill-adversarial-filtered-posted.md` — Epic
-- `backlog/004-pr-review-rubric-and-output-format-references.md`
-- `backlog/005-pr-review-single-pass-opus-47-synthesizer.md`
-- `backlog/006-pr-review-renderer-pending-review-posting-diagram-rule.md`
-- `backlog/007-pr-review-voice-post-filter.md`
-- `backlog/008-pr-review-haiku-early-exit-gate.md`
+- `backlog/004-pr-review-synthesizer-with-rubric-and-output-format.md`
+- `backlog/005-pr-review-renderer-pending-review-posting-diagram-rule.md`
+- `backlog/006-pr-review-voice-post-filter.md`
