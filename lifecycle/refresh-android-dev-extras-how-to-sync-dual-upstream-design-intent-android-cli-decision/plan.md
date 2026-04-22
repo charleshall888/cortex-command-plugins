@@ -16,25 +16,25 @@ Sequence guard-mechanism verification (on a representative plugin-loader substra
 - **Verification**: Interactive/session-dependent: mechanism verification requires loading a skill through the Claude Code plugin loader in a live session and inspecting whether the injection marker appears — no bash command reproduces the skill-loader code path. Resolves only whether the injection FIRES; whether Claude HONORS the resulting abort instruction is tested in Verification Strategy step 5 (behavioral smoke check).
 - **Status**: [ ] pending
 
-### Task 2: Fetch upstream v0.0.2 android-cli content + NOTICE presence check
+### Task 2: Verify local android-cli source (post-scope-override) + NOTICE check
 
-- **Files**: `/tmp/android-skills-v0.0.2/` (staging directory; not committed)
-- **What**: Download `github.com/android/skills` at tag `v0.0.2` release zip (or `git clone --depth=1 --branch=v0.0.2`); extract to staging; record NOTICE absence (or presence — in which case Task 3 additionally copies it verbatim to `plugins/android-dev-extras/NOTICE` per Apache 2.0 §4(d)). Resolves Open Decision #2.
+- **Files**: none (verification-only; no staging directory created)
+- **What**: SCOPE OVERRIDE (logged to events.log 2026-04-22): verification during implementation confirmed `android-cli` is absent from both documented upstreams — neither `github.com/android/skills` (checked tags v0.0.1, v0.0.2, main branch, and github-skills branch) nor `dl.google.com/dac/dac_skills.zip` contains android-cli. It ships only with the local `android` CLI install at `~/.android/cli/skills/android-cli/`. Source pivoted from upstream to local per user decision (accepted non-reproducibility trade-off). This task now: verify local source exists at expected layout, confirm no NOTICE file in the local install, record local CLI version as the provenance reference.
 - **Depends on**: none
 - **Complexity**: simple
-- **Context**: Canonical fetch URL is `https://github.com/android/skills/archive/refs/tags/v0.0.2.zip` or via `git clone --depth=1 --branch=v0.0.2 https://github.com/android/skills /tmp/android-skills-v0.0.2-repo`. Skill content under `system/android-cli/` (3 files). Research noted no NOTICE as of 2026-04-22; spec line 120 mandates re-verification. If upstream NOTICE exists, Task 3 merge semantics are "upstream copyright stanzas appended to existing plugin-authored NOTICE." Branch-point judgement on the specifics stays at implementation time per spec Open Decision #2 (explicit deferral).
-- **Verification**: (a) `test -d /tmp/android-skills-v0.0.2/system/android-cli && test -f /tmp/android-skills-v0.0.2/system/android-cli/SKILL.md && test -f /tmp/android-skills-v0.0.2/system/android-cli/references/interact.md && test -f /tmp/android-skills-v0.0.2/system/android-cli/references/journeys.md` — pass if exit 0; (b) `find /tmp/android-skills-v0.0.2 -maxdepth 2 -name NOTICE -print` output recorded (empty string = no upstream NOTICE, matching research; non-empty = Task 3 expands to copy it)
-- **Status**: [ ] pending
+- **Context**: Local source path: `~/.android/cli/skills/android-cli/SKILL.md`, `~/.android/cli/skills/android-cli/references/interact.md`, `~/.android/cli/skills/android-cli/references/journeys.md`. Local CLI version tracked in `~/.android/cli/skills/version` (expected `0.7.15232955` per research). NOTICE verification: `~/.android/cli/skills/` contains `LICENSE.txt` but no NOTICE (confirmed during implementation); nothing to propagate per Apache 2.0 §4(d).
+- **Verification**: (a) `test -f ~/.android/cli/skills/android-cli/SKILL.md && test -f ~/.android/cli/skills/android-cli/references/interact.md && test -f ~/.android/cli/skills/android-cli/references/journeys.md` — pass if exit 0; (b) `find ~/.android/cli/skills -maxdepth 2 -name NOTICE -print` output empty (no NOTICE to propagate); (c) `cat ~/.android/cli/skills/version` records CLI provenance (informational; Task 8's Accepted divergences entry will cite this version)
+- **Status**: [x] completed
 
-### Task 3: Vendor android-cli files verbatim (path-flattened) + conditional NOTICE
+### Task 3: Vendor android-cli files verbatim from local source
 
-- **Files**: `plugins/android-dev-extras/skills/android-cli/SKILL.md`, `plugins/android-dev-extras/skills/android-cli/references/interact.md`, `plugins/android-dev-extras/skills/android-cli/references/journeys.md` (create 3). Conditionally: `plugins/android-dev-extras/NOTICE` (modify, only if Task 2 found upstream NOTICE).
-- **What**: Copy staged files to plugin location with `system/` category prefix dropped per HOW-TO-SYNC path-mapping rule. Byte-identical to upstream; guard and marker added in Task 4. If upstream NOTICE exists, append its stanzas verbatim to `plugins/android-dev-extras/NOTICE` (plugin-authored stanza retained as first entry).
+- **Files**: `plugins/android-dev-extras/skills/android-cli/SKILL.md`, `plugins/android-dev-extras/skills/android-cli/references/interact.md`, `plugins/android-dev-extras/skills/android-cli/references/journeys.md` (create 3).
+- **What**: Copy local files to plugin location. No path-flattening needed (local source is already flat — unlike DAC/GitHub, which categorize under `system/`, `performance/`, etc.). Byte-identical to local; guard and marker added in Task 4. NOTICE is not applicable (Task 2 verified none in local install).
 - **Depends on**: [2]
 - **Complexity**: simple
-- **Context**: Source→destination: `/tmp/android-skills-v0.0.2/system/android-cli/SKILL.md` → `plugins/android-dev-extras/skills/android-cli/SKILL.md` (similarly for `references/interact.md` and `references/journeys.md`). Pattern reference: existing `r8-analyzer/`, `edge-to-edge/` under `plugins/android-dev-extras/skills/` follow this layout.
-- **Verification**: (a) `diff -r /tmp/android-skills-v0.0.2/system/android-cli/ plugins/android-dev-extras/skills/android-cli/` — pass if exit 0 and no output (byte-identical pre-patch); (b) if Task 2 found upstream NOTICE: `grep -F "$(head -1 /tmp/android-skills-v0.0.2/NOTICE)" plugins/android-dev-extras/NOTICE` — pass if exit 0 (upstream stanza present verbatim)
-- **Status**: [ ] pending
+- **Context**: Source→destination mapping (no category prefix in source): `~/.android/cli/skills/android-cli/SKILL.md` → `plugins/android-dev-extras/skills/android-cli/SKILL.md` (similarly for `references/interact.md` and `references/journeys.md`). Pattern reference: existing `r8-analyzer/`, `edge-to-edge/` under `plugins/android-dev-extras/skills/` follow the destination layout.
+- **Verification**: `diff -r ~/.android/cli/skills/android-cli/ plugins/android-dev-extras/skills/android-cli/` — pass if exit 0 and no output (byte-identical pre-patch)
+- **Status**: [x] completed
 
 ### Task 4: Apply CFA-PATCH marker + detect-then-load guard to vendored SKILL.md
 

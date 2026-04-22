@@ -94,3 +94,17 @@
       rationale: "Spec Open Decision #2 explicitly defers NOTICE presence/merge to implementation time ('authoritative check runs against fetched content, not against any pre-fetched copy'). Pre-specifying merge semantics would contradict the spec's deferral."
   status: ok
 {"ts": "2026-04-22T20:32:42Z", "event": "phase_transition", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "from": "plan", "to": "implement"}
+- ts: 2026-04-22T20:55:44Z
+  event: scope_override
+  feature: refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision
+  phase: implement
+  trigger: "Task 2 verified android-cli absent from both documented upstreams (GitHub v0.0.2 and dl.google.com/dac/dac_skills.zip). Research assumed system/android-cli/ path based on local ~/.android/cli/skills/ layout without verifying upstream presence."
+  decision: "Source pivoted from upstream (GitHub v0.0.2 system/android-cli/) to local ~/.android/cli/skills/android-cli/ — research's rejected Alt B. User accepted non-reproducibility trade-off to preserve per-project-toggle value for Claude Code users."
+  implications:
+    - "Spec Req 5 source path is stale; vendoring proceeds from local install at CLI version 0.7.15232955"
+    - "Apache 2.0 section 4(d) NOTICE: verified absent in local ~/.android/cli/skills/ (same as DAC and GitHub). No NOTICE to propagate."
+    - "Plan Task 2 replaced: no upstream staging fetch; verify local source and copy directly. Task 3 vendors from local."
+    - "Future re-sync procedure (HOW-TO-SYNC Req 12) will need user to re-run 'android init' to refresh local copy; cannot diff against publicly-attested upstream for android-cli alone."
+    - "Accepted divergences entry (Task 8) will also document source-channel divergence: android-cli shipped from local CLI install, not from DAC or GitHub."
+{"ts": "2026-04-22T20:57:11Z", "event": "task_complete", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "task": 2, "batch": 0, "status": "success", "note": "verification-only, post-scope-override; no repo state change"}
+{"ts": "2026-04-22T20:57:54Z", "event": "task_complete", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "task": 3, "batch": 1, "status": "success", "files_created": 3}
