@@ -2,6 +2,13 @@
 name: android-cli
 description: Orchestrates Android development tasks including project creation, deployment, SDK management, and environment diagnostics using the `android` command-line tool.
 ---
+
+<!-- CFA-PATCH: see plugins/android-dev-extras/HOW-TO-SYNC.md §Accepted divergences -->
+
+!`command -v android || echo NOT_INSTALLED`
+
+**Preconditions check**: if the shell-injected output above reads `NOT_INSTALLED`, abort every `android`/`adb` flow in this skill — the Android CLI is not installed on this machine. Do not proceed with any subcommand invocations; surface the missing binary to the user and stop.
+
 # Android CLI Specialist
 
 This skill provides instructions for using the `android` CLI tool. The tool includes various commands for creating projects, running applications, interacting with devices, and managing the CLI environment.

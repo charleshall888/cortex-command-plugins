@@ -37,15 +37,18 @@ This is an AI-guided workflow, not an automated script. Next time you want to re
 1. Open a Claude Code session in this plugin directory.
 2. Ask Claude: "sync android skills per HOW-TO-SYNC.md."
 3. Claude should:
-   - Fetch the upstream tree: `gh api "repos/android/skills/git/trees/main?recursive=1"`.
+   - Fetch the upstream tree: `gh api "repos/android/skills/git/trees/main?recursive=1"` (for DAC/GitHub-sourced skills) OR run `android init` to refresh `~/.android/cli/skills/` (for CLI-bundled skills listed in `### Accepted divergences`).
    - For each currently-vendored skill, fetch upstream SKILL.md and `references/**`, compare against vendored copy.
+   - **Divergence preservation** (for every file listed in `### Accepted divergences`): BEFORE the verbatim overwrite, snapshot the vendored copy's divergence content (the CFA-PATCH marker, the guard block, and any inline markers cited in the entry). AFTER the overwrite, reapply the divergence content per the entry's placement rule — reapply at the position relative to the post-pull frontmatter/first-heading boundaries, NOT at literal pre-pull byte offsets. The `### Accepted divergences` section is the authoritative re-sync contract; consult it for each listed file.
    - Surface a diff summary: unchanged / content-modified / references added/removed / skill removed upstream.
    - For new skills in upstream that are NOT vendored here: list them and ask whether to curate any in. Do not add them silently.
    - Update `LICENSE` if upstream `LICENSE.txt` has changed (verbatim copy).
    - Update `NOTICE` if the upstream copyright year or attribution has changed.
-4. Run validation locally: `python3 scripts/validate-skill.py plugins/android-dev-extras/skills` (from the cortex-command-plugins repo root). Must exit 0 with no warnings.
-5. Commit via the `/commit` skill. Never use raw `git commit` or `git -C`.
-6. Push to GitHub remote — the marketplace source is `https://github.com/charleshall888/cortex-command-plugins.git`, so pushing is required for other project sessions to pick up changes.
+   - **Post-update safety check** (for every file listed in `### Accepted divergences`): verify the `CFA-PATCH` marker is present in the post-update file AND positioned inside the frontmatter→first-heading window (between the closing frontmatter `---` and the first `#` heading). A marker that is absent OR present-but-mispositioned fails the sync; investigate before proceeding.
+4. Run `android skills list` and reconcile its output against the union of `### Covered skills` + `### Deferred candidates`. Any skill in the CLI output that is absent from both lists surfaces a new curation decision — the curator must decide whether to cover or defer before completing sync; do NOT silently skip unlisted skills.
+5. Run validation locally: `python3 scripts/validate-skill.py plugins/android-dev-extras/skills` (from the cortex-command-plugins repo root). Must exit 0 with no warnings.
+6. Commit via the `/commit` skill. Never use raw `git commit` or `git -C`.
+7. Push to GitHub remote — the marketplace source is `https://github.com/charleshall888/cortex-command-plugins.git`, so pushing is required for other project sessions to pick up changes.
 
 ## Apache 2.0 attribution obligation
 
@@ -60,11 +63,15 @@ Apache 2.0 § 4 requires distributing derivative works with:
 
 - `r8-analyzer` — analyzes R8 keep rules and identifies redundancies; read-only.
 - `edge-to-edge` — migrates Jetpack Compose apps to adaptive edge-to-edge; read-only analysis + targeted edits.
-- `android-cli` — interacts with Android devices and emulators via the `android` CLI.
+- `android-cli` — interacts with Android devices and emulators via the `android` CLI; see `### Accepted divergences` for source and guard patch.
 
 ### Accepted divergences
 
-_No entries yet._
+- **`skills/android-cli/SKILL.md`** — first accepted divergence from the verbatim-mirror policy. Two related divergences:
+  - **Source channel**: android-cli is absent from both documented upstreams (`dl.google.com/dac/dac_skills.zip` and `github.com/android/skills` at any tag or branch). It ships only with the `android` CLI binary's install at `~/.android/cli/skills/android-cli/`. Initial vendoring source: local install at CLI version `0.7.15232955`. Re-sync requires running `android init` on the curator's machine to refresh the local copy before diffing; diff against public upstream is not possible.
+  - **Content patch**: a Claude-specific detect-then-load guard is added at the top of the vendored SKILL.md — a `<!-- CFA-PATCH: ... -->` HTML comment marker followed by `` !`command -v android || echo NOT_INSTALLED` `` dynamic context injection plus a prose abort instruction. Rationale: per-project toggle for Claude Code users on machines without the Android CLI installed; the dynamic injection provides a runtime signal so Claude can abort `android`/`adb` flows when the binary is absent. The guard is advisory (relies on Claude reading the injected marker and honoring the adjacent abort instruction, not loader-level enforcement).
+  - **Placement rule (durable re-sync guidance)**: the `CFA-PATCH` marker and guard block sit inside the body between the closing frontmatter `---` and the first `#` heading. On re-sync, reapply at that position relative to the post-pull frontmatter/first-heading boundaries — do NOT paste at literal byte offsets from the pre-pull file, and do NOT place the marker or guard below the first `#` heading (that violates the Apache 2.0 §4(b) "prominent notice" requirement).
+  - **Post-update check**: after reapplying the guard, verify the `CFA-PATCH` marker is present AND positioned inside the frontmatter→first-heading window. A marker that is present but mispositioned fails the sync.
 
 ### Deferred candidates
 
