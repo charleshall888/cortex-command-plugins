@@ -1,0 +1,96 @@
+{"ts": "2026-04-22T19:03:38Z", "event": "discovery_reference", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "epic_research": "research/android-dev-extras-registry/research.md", "epic_spec": null}
+- ts: 2026-04-22T19:07:56Z
+  event: clarify_critic
+  feature: refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision
+  findings:
+    - "The High rating for intent clarity is partially unsupported — sub-change (1) 'preamble' has no guidance on structure, placement, or tone in the source."
+    - "Intent clarity enumeration collapses sub-change (2) into one item and omits the embedded check-step ('run android skills list on each refresh and reconcile with covered + deferred lists')."
+    - "Scope asserts single-file (HOW-TO-SYNC.md) but sub-change (3) uses action language ('vendor with a detect-then-load guard') that may require edits to android-cli SKILL.md itself, not just documentation of the decision."
+    - "Scope boundedness High rating does not engage with the ambiguity between 'document the vendoring decision' and 'execute the vendoring decision' in the source."
+    - "Deferred section enumerates drift-detection / dac-URL-stability / external-consumer-policy but does not address in/out status of the check-step or android-cli SKILL edits."
+    - "Requirements alignment Skipped is asserted via filesystem claim ('no requirements/ directory') not visible in the ticket source."
+    - "Complexity rated simple is poorly supported — sub-change (3) explicitly frames the edit as 'the first Claude-specific patch on vendored content', a policy precedent, not a mechanical change."
+    - "Criticality medium does not reflect that HOW-TO-SYNC governs upstream reconciliation and encodes the accepted-divergence policy for future refreshes."
+  dispositions:
+    apply: 3
+    dismiss: 4
+    ask: 1
+  applied_fixes:
+    - "Revised sub-change enumeration to call out (2a) rewrite upstream section + (2b) add check-step for 'android skills list' reconciliation — both explicit in the source body."
+    - "Confirmed the check-step is in-scope per the 'What the refresh covers' section; the deferred list does not need to mention it because it is actively included, not deferred."
+    - "Escalated complexity from simple to complex — sub-change (3) introduces a new pattern (first-of-its-kind Claude-specific patch on vendored content, accepted-divergence policy). Per complexity spec: 'introduces new patterns' → complex. 'When in doubt, prefer complex.'"
+  dismissals:
+    - finding_index: 0
+      rationale: "Intent clarity is about goal unambiguity, not implementation-detail specification. The preamble's goal ('Why this plugin exists — these four attributes') is clear in the source; structural discretion (heading level, bullet vs. prose, placement) is a spec-phase concern."
+    - finding_index: 3
+      rationale: "Duplicate of Finding 2 — the same doc-vs-execute ambiguity is captured once as an Ask item; Dismiss to avoid double-counting the same objection."
+    - finding_index: 5
+      rationale: "Clarify §2 prescribes a filesystem check for the requirements/ directory. The reviewer performed that canonical §2 check and verified the directory does not exist in the cortex-command-plugins repo; the skip is the prescribed outcome, not an unsupported out-of-band claim."
+    - finding_index: 7
+      rationale: "The ticket body explicitly frames the work as proportionate ('the plugin has 2 skills and 1 known consumer'). HOW-TO-SYNC governs a personal plugin, not shared skill/workflow/overnight-runner infrastructure, so the 'medium' default for isolated tooling changes applies over the 'high' default reserved for shared skill/workflow changes. Governance impact exists but is bounded."
+  status: ok
+{"ts": "2026-04-22T19:14:08Z", "event": "lifecycle_start", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "tier": "complex", "criticality": "medium"}
+{"ts": "2026-04-22T19:14:08Z", "event": "phase_transition", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "from": "clarify", "to": "research"}
+{"ts": "2026-04-22T19:21:45Z", "event": "phase_transition", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "from": "research", "to": "specify"}
+{"ts": "2026-04-22T19:50:41Z", "event": "orchestrator_review", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "phase": "specify", "verdict": "flag", "cycle": 1, "issues": ["S1: Requirements 2, 3, 6 include 'verify visually' AC items that don't match binary-checkable forms (a/b/c).", "S3: MoSCoW classification not explicit — spec does not state whether all 11 Requirements are Must-have or whether any are Should/Could."]}
+{"ts": "2026-04-22T19:50:41Z", "event": "orchestrator_dispatch_fix", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "phase": "specify", "mode": "fresh_subagent", "issue": "Tighten S1 'verify visually' AC items to awk-scoped commands; add S3 MoSCoW annotation (all Requirements are Must-have with explicit rationale)."}
+{"ts": "2026-04-22T19:53:11Z", "event": "orchestrator_review", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "phase": "specify", "verdict": "pass", "cycle": 2, "issues": []}
+- ts: 2026-04-22T20:05:23Z
+  event: critical_review
+  feature: refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision
+  phase: specify
+  angles_dispatched: 4
+  angles_completed: 4
+  synthesis_model: opus
+  dispositions:
+    apply: 9
+    dismiss: 3
+    ask: 0
+  applied_fixes:
+    - "MoSCoW annotation updated for 12 reqs and explicit advisory-guard acknowledgment."
+    - "Req 6 reframed: guard is advisory; prose-paragraph fallback if !<cmd> unsupported in skill bodies."
+    - "Added Req 12: divergence preservation in sync procedure (branch on ### Accepted divergences during update + post-update marker safety check)."
+    - "Added 3 edge cases: PATH-but-unexecutable, runtime CLI version skew, skill-body !<cmd> unsupported."
+    - "Added 2 non-requirements: divergence-budget revisit threshold, no runtime version-compatibility mitigation."
+    - "Changes to Existing Behavior: sync procedure modification entry expanded to cover Req 12."
+    - "Technical Constraints: §4(b) durability paragraph explains why Req 12 is needed; skill-body !<cmd> verification gate added."
+    - "Open Decisions: None → 2 items (skill-body !<cmd> verification, NOTICE presence re-check at fetch)."
+  dismissals:
+    - finding: "byte-identical locks in upstream bug (android screenshot vs. android screen capture)"
+      rationale: "Non-Requirements line 69 already excludes rewording/re-tuning of vendored file; ship verbatim + fix upstream is the stated policy."
+    - finding: "verbatim-mirror vs. first accepted divergence tension"
+      rationale: "The 3-subsection structure plus the admission surface operationalize the distinction; not a real contradiction."
+    - finding: "Req 9 + Req 8 duplication risk"
+      rationale: "Req 9 explicitly says 'with a short note pointing readers to ### Accepted divergences' — single-source-of-truth is the divergences entry."
+  status: ok
+{"ts": "2026-04-22T20:13:43Z", "event": "phase_transition", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "from": "specify", "to": "plan"}
+{"ts": "2026-04-22T20:19:04Z", "event": "orchestrator_review", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "phase": "plan", "verdict": "pass", "cycle": 1, "issues": []}
+- ts: 2026-04-22T20:31:32Z
+  event: critical_review
+  feature: refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision
+  phase: plan
+  angles_dispatched: 4
+  angles_completed: 4
+  synthesis_model: opus
+  dispositions:
+    apply: 10
+    dismiss: 2
+    ask: 0
+  applied_fixes:
+    - "Verification Strategy step 5 added: behavioral guard smoke check (interactive/session-dependent) — separates mechanism-fire from behavioral-honor."
+    - "Task 1 substrate rewritten from ~/.claude/skills/ to plugins/android-dev-extras/skills/_skill-body-injection-test/ — same loader path as vendored destination."
+    - "Task 8 now carries guard placement rule forward into the Accepted divergences entry as durable re-sync guidance (not just plan-internal)."
+    - "Task 9 post-update safety check strengthened to verify position (frontmatter→first-heading window), not just presence."
+    - "Tasks 5-9 re-anchored on heading text, not line numbers; 'Re-read HOW-TO-SYNC.md before editing' added to each task's Context."
+    - "android-cli cross-reference in ### Covered skills moved from Task 7 to Task 8 — eliminates dangling-pointer state on partial completion."
+    - "Task 7 verification adds sibling-order AC (g): diff against expected subsection sequence enforces Covered → Accepted divergences → Deferred."
+    - "Task 4 Context distinguishes dynamic-injection vs. prose-fallback path semantics explicitly; fallback path acknowledges static-vs-runtime distinction."
+    - "Task 10 diff baseline changed from git diff HEAD to git diff $(cat /tmp/task-plan-baseline-ref) — ref captured by Task 1, survives mid-plan commits."
+    - "Task 4 AC (a) restructured to check file content only (no cross-task state); the acknowledge-in-Task-8 condition moved to Task 8 AC (f)."
+  dismissals:
+    - finding: "Apache 4(b) 'prominent' threshold not lexically encoded for abort-prose strength."
+      rationale: "Spec Technical Constraints line 108 establishes CFA-PATCH marker + Accepted divergences entry as sufficient 4(b) compliance. Expanding to prose-strength ACs is a spec-level question, not a plan-level fix."
+    - finding: "NOTICE handling branch-point deferred to implementer judgment."
+      rationale: "Spec Open Decision #2 explicitly defers NOTICE presence/merge to implementation time ('authoritative check runs against fetched content, not against any pre-fetched copy'). Pre-specifying merge semantics would contradict the spec's deferral."
+  status: ok
+{"ts": "2026-04-22T20:32:42Z", "event": "phase_transition", "feature": "refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision", "from": "plan", "to": "implement"}

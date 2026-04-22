@@ -1,1 +1,5 @@
 {"v":1,"ts":"2026-04-22T15:51:13Z","event":"status_changed","item_uuid":"d2654183-a31e-471c-b984-aa3a033b386c","session_id":"3164dd5c-cd97-4368-a8c6-956d2f794c7d","details":{"from":null,"to":"backlog"}}
+{"v":1,"ts":"2026-04-22T19:03:20Z","event":"status_changed","item_uuid":"d2654183-a31e-471c-b984-aa3a033b386c","session_id":"9fe925d7-df73-4afc-8677-fe2e3ebabb5f","details":{"from":"backlog","to":"in_progress"}}
+{"v":1,"ts":"2026-04-22T19:03:20Z","event":"phase_changed","item_uuid":"d2654183-a31e-471c-b984-aa3a033b386c","session_id":"9fe925d7-df73-4afc-8677-fe2e3ebabb5f","details":{"from":null,"to":"research"}}
+{"v":1,"ts":"2026-04-22T20:13:58Z","event":"phase_changed","item_uuid":"d2654183-a31e-471c-b984-aa3a033b386c","session_id":"90b23545-ef95-44ee-9a20-5250e61e31aa","details":{"from":"research","to":"plan"}}
+{"v":1,"ts":"2026-04-22T20:32:43Z","event":"phase_changed","item_uuid":"d2654183-a31e-471c-b984-aa3a033b386c","session_id":"90b23545-ef95-44ee-9a20-5250e61e31aa","details":{"from":"plan","to":"implement"}}

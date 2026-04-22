@@ -2,13 +2,18 @@
 schema_version: "1"
 uuid: d2654183-a31e-471c-b984-aa3a033b386c
 title: "Refresh android-dev-extras HOW-TO-SYNC: dual upstream, design intent, android-cli decision"
-status: backlog
+status: in_progress
 priority: high
 type: chore
 tags: [android-dev-extras-registry]
 created: 2026-04-22
 updated: 2026-04-22
 discovery_source: research/android-dev-extras-registry/research.md
+session_id: 90b23545-ef95-44ee-9a20-5250e61e31aa
+lifecycle_phase: implement
+lifecycle_slug: refresh-android-dev-extras-how-to-sync-dual-upstream-design-intent-android-cli-decision
+complexity: complex
+criticality: medium
 ---
 
 ## Value
