@@ -1,12 +1,12 @@
 [
   {
-    "id": 2,
-    "title": "Refresh android-dev-extras HOW-TO-SYNC: dual upstream, design intent, android-cli decision",
-    "status": "backlog",
+    "id": 3,
+    "title": "Redesign pr-review skill: adversarial filtering, Conventional Comments output, pending-review posting",
+    "status": "refined",
     "priority": "high",
-    "type": "chore",
+    "type": "epic",
     "tags": [
-      "android-dev-extras-registry"
+      "pr-review-skill-improvements"
     ],
     "areas": [],
     "created": "2026-04-22",
@@ -16,9 +16,91 @@
     "parent": null,
     "research": null,
     "spec": null,
-    "discovery_source": "research/android-dev-extras-registry/research.md",
+    "discovery_source": "research/pr-review-skill-improvements/research.md",
     "plan": null,
-    "uuid": "d2654183-a31e-471c-b984-aa3a033b386c",
+    "uuid": "31eff7f8-2716-4898-a4d1-aa20ae9a69ef",
+    "lifecycle_slug": null,
+    "session_id": null,
+    "lifecycle_phase": null,
+    "schema_version": "1",
+    "repo": null
+  },
+  {
+    "id": 4,
+    "title": "Rewrite pr-review synthesis stage with three-axis rubric and Conventional Comments output format",
+    "status": "in_progress",
+    "priority": "high",
+    "type": "feature",
+    "tags": [
+      "pr-review-skill-improvements"
+    ],
+    "areas": [],
+    "created": "2026-04-22",
+    "updated": "2026-04-22",
+    "blocks": [],
+    "blocked_by": [],
+    "parent": "3",
+    "research": null,
+    "spec": null,
+    "discovery_source": "research/pr-review-skill-improvements/research.md",
+    "plan": null,
+    "uuid": "9061e399-0236-45f5-ae55-e79af91dc9d4",
+    "lifecycle_slug": "rewrite-pr-review-synthesis-stage-with-three-axis-rubric-and-conventional-comments-output-format",
+    "session_id": "fb0002e6-56f9-41f4-ad20-21122166af75",
+    "lifecycle_phase": "specify",
+    "schema_version": "1",
+    "repo": null
+  },
+  {
+    "id": 5,
+    "title": "Add pr-review renderer, pending-review posting via gh api, and diagram decision rule",
+    "status": "refined",
+    "priority": "high",
+    "type": "feature",
+    "tags": [
+      "pr-review-skill-improvements"
+    ],
+    "areas": [],
+    "created": "2026-04-22",
+    "updated": "2026-04-22",
+    "blocks": [],
+    "blocked_by": [
+      "4"
+    ],
+    "parent": "3",
+    "research": null,
+    "spec": null,
+    "discovery_source": "research/pr-review-skill-improvements/research.md",
+    "plan": null,
+    "uuid": "8a173f35-8f46-4266-a811-6b87f2c23bcf",
+    "lifecycle_slug": null,
+    "session_id": null,
+    "lifecycle_phase": null,
+    "schema_version": "1",
+    "repo": null
+  },
+  {
+    "id": 6,
+    "title": "Add pr-review voice post-filter: em-dash strip and AI-tell sentence regeneration",
+    "status": "refined",
+    "priority": "medium",
+    "type": "feature",
+    "tags": [
+      "pr-review-skill-improvements"
+    ],
+    "areas": [],
+    "created": "2026-04-22",
+    "updated": "2026-04-22",
+    "blocks": [],
+    "blocked_by": [
+      "5"
+    ],
+    "parent": "3",
+    "research": null,
+    "spec": null,
+    "discovery_source": "research/pr-review-skill-improvements/research.md",
+    "plan": null,
+    "uuid": "d69dda29-70dc-44da-ab36-9cc3c7c938a4",
     "lifecycle_slug": null,
     "session_id": null,
     "lifecycle_phase": null,
