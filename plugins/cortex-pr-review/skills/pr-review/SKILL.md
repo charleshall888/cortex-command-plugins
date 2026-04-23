@@ -6,7 +6,7 @@ argument-hint: "[number]"
 inputs:
   - "number: string (optional) — GitHub PR number; omit to review the PR for the current branch"
 outputs:
-  - "Review verdict: APPROVE | REQUEST_CHANGES | REJECT with synthesized findings (stdout)"
+  - "Review verdict (APPROVE | REQUEST_CHANGES), Conventional Comments-labeled findings list, observability footer with dropped-finding details (stdout)"
 preconditions:
   - "GitHub CLI (gh) installed and authenticated"
   - "Repository must be a GitHub repo"
@@ -37,7 +37,7 @@ The pipeline fetches PR metadata and the full diff, then runs a Haiku triage age
 classify changed files by review priority. Four Sonnet agents run in parallel — each
 examining the diff from a different angle: project convention compliance, bug scanning,
 git history context, and historical PR feedback on the same files. An Opus agent then
-cross-validates their findings and issues a verdict of APPROVE, REQUEST CHANGES, or REJECT.
+cross-validates their findings and issues a verdict of APPROVE or REQUEST CHANGES.
 The main agent presents the synthesis output and keeps all prior agent outputs available
 for follow-up questions.
 
