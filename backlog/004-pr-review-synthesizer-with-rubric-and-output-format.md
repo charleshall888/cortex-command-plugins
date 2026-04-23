@@ -2,14 +2,19 @@
 schema_version: "1"
 uuid: 9061e399-0236-45f5-ae55-e79af91dc9d4
 title: "Rewrite pr-review synthesis stage with three-axis rubric and Conventional Comments output format"
-status: ready
+status: complete
 priority: high
 type: feature
 tags: [pr-review-skill-improvements]
 created: 2026-04-22
-updated: 2026-04-22
+updated: 2026-04-23
 parent: 3
 discovery_source: research/pr-review-skill-improvements/research.md
+session_id: null
+lifecycle_phase: complete
+lifecycle_slug: rewrite-pr-review-synthesis-stage-with-three-axis-rubric-and-conventional-comments-output-format
+complexity: complex
+criticality: high
 ---
 
 ## Value

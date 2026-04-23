@@ -1,0 +1,6 @@
+{"v":1,"ts":"2026-04-22T20:34:24Z","event":"status_changed","item_uuid":"9061e399-0236-45f5-ae55-e79af91dc9d4","session_id":"fb0002e6-56f9-41f4-ad20-21122166af75","details":{"from":"ready","to":"in_progress"}}
+{"v":1,"ts":"2026-04-22T20:34:24Z","event":"phase_changed","item_uuid":"9061e399-0236-45f5-ae55-e79af91dc9d4","session_id":"fb0002e6-56f9-41f4-ad20-21122166af75","details":{"from":null,"to":"research"}}
+{"v":1,"ts":"2026-04-23T02:13:09Z","event":"phase_changed","item_uuid":"9061e399-0236-45f5-ae55-e79af91dc9d4","session_id":"61bd88f5-444a-4a32-9f5c-833f10ee8c33","details":{"from":"research","to":"implement"}}
+{"v":1,"ts":"2026-04-23T17:58:45Z","event":"phase_changed","item_uuid":"9061e399-0236-45f5-ae55-e79af91dc9d4","session_id":"61bd88f5-444a-4a32-9f5c-833f10ee8c33","details":{"from":"implement","to":"review"}}
+{"v":1,"ts":"2026-04-23T18:12:11Z","event":"phase_changed","item_uuid":"9061e399-0236-45f5-ae55-e79af91dc9d4","session_id":"61bd88f5-444a-4a32-9f5c-833f10ee8c33","details":{"from":"review","to":"complete"}}
+{"v":1,"ts":"2026-04-23T18:12:33Z","event":"status_changed","item_uuid":"9061e399-0236-45f5-ae55-e79af91dc9d4","session_id":"61bd88f5-444a-4a32-9f5c-833f10ee8c33","details":{"from":"in_progress","to":"complete"}}

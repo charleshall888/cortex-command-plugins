@@ -26,32 +26,6 @@
     "repo": null
   },
   {
-    "id": 4,
-    "title": "Rewrite pr-review synthesis stage with three-axis rubric and Conventional Comments output format",
-    "status": "in_progress",
-    "priority": "high",
-    "type": "feature",
-    "tags": [
-      "pr-review-skill-improvements"
-    ],
-    "areas": [],
-    "created": "2026-04-22",
-    "updated": "2026-04-22",
-    "blocks": [],
-    "blocked_by": [],
-    "parent": "3",
-    "research": null,
-    "spec": null,
-    "discovery_source": "research/pr-review-skill-improvements/research.md",
-    "plan": null,
-    "uuid": "9061e399-0236-45f5-ae55-e79af91dc9d4",
-    "lifecycle_slug": "rewrite-pr-review-synthesis-stage-with-three-axis-rubric-and-conventional-comments-output-format",
-    "session_id": "fb0002e6-56f9-41f4-ad20-21122166af75",
-    "lifecycle_phase": "specify",
-    "schema_version": "1",
-    "repo": null
-  },
-  {
     "id": 5,
     "title": "Add pr-review renderer, pending-review posting via gh api, and diagram decision rule",
     "status": "refined",
@@ -62,11 +36,9 @@
     ],
     "areas": [],
     "created": "2026-04-22",
-    "updated": "2026-04-22",
+    "updated": "2026-04-23",
     "blocks": [],
-    "blocked_by": [
-      "4"
-    ],
+    "blocked_by": [],
     "parent": "3",
     "research": null,
     "spec": null,
