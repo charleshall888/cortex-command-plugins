@@ -244,6 +244,8 @@ Respond in this exact structure:
 **Summary:** <one sentence>
 ```
 
+In addition to the prose bullets, emit a JSON array named `findings[]` with one object per finding conforming to the Evidence schema defined at the top of Stage 3. Each finding object MUST set `"category": "compliance"`.
+
 **Failure handling:** If Agent 1 fails, record the error. Opus will proceed without
 compliance findings; note the gap in the final output.
 
@@ -303,6 +305,8 @@ Respond in this exact structure:
 
 **Summary:** <one sentence>
 ```
+
+In addition to the prose bullets, emit a JSON array named `findings[]` with one object per finding conforming to the Evidence schema defined at the top of Stage 3. Each finding object MUST set `"category": "bug"`.
 
 **Failure handling:** If Agent 2 fails, record the error. Opus will proceed without bug
 scan findings; note the gap in the final output.
@@ -386,6 +390,8 @@ Respond in this exact structure:
 **Summary:** <one sentence>
 ```
 
+In addition to the prose bullets, emit a JSON array named `findings[]` with one object per finding conforming to the Evidence schema defined at the top of Stage 3. Each finding object MUST set `"category": "history"`.
+
 **Failure handling:** If Agent 3 fails, record the error. Opus will proceed without
 history findings; note the gap in the final output.
 
@@ -461,6 +467,8 @@ Respond in this exact structure:
 
 **Summary:** <one sentence>
 ```
+
+In addition to the prose bullets, emit a JSON array named `findings[]` with one object per finding conforming to the Evidence schema defined at the top of Stage 3. Each finding object MUST set `"category": "historical-comment"`.
 
 **Failure handling:** If Agent 4 fails, record the error. Opus will proceed without
 historical comment findings; note the gap in the final output.
