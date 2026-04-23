@@ -101,6 +101,47 @@ Dispatch all four agents concurrently. Every agent receives: the full diff, the 
 (title, body, author, file list, branch names), and the triage output from Stage 2. Each
 agent also has unique data-fetching responsibilities described below.
 
+### Evidence schema (required for all findings)
+
+Every finding emitted by any of the four critics MUST conform to the following schema.
+Each `findings[]` entry has fields `claim`, `label_hint`, `evidence`, `suggested_fix`, and `category`.
+The `label_hint` field is one of: `issue`, `suggestion`, `nitpick`, `question`, `praise`, `cross-cutting`, or `null`.
+The `category` field is one of: `bug`, `compliance`, `history`, or `historical-comment`.
+Stage 4 relies on this shared shape to synthesize the final review; critics that emit
+divergent shapes will have their findings dropped.
+
+```ts
+{
+  claim: string,
+  label_hint:
+    | "issue"
+    | "suggestion"
+    | "nitpick"
+    | "question"
+    | "praise"
+    | "cross-cutting"
+    | null,
+  evidence: {
+    path: string,
+    line_range: [int, int],
+    quoted_text: string | null,
+    matched_side: "+" | "-" | " " | null,
+    rationale: string | null
+  },
+  suggested_fix: string | null,
+  category: "bug" | "compliance" | "history" | "historical-comment"
+}
+```
+
+**Conditional requirement on `evidence.quoted_text` and `evidence.rationale`:**
+
+- When `label_hint` is `question` or `cross-cutting`, `evidence.quoted_text` MAY be
+  `null` (the finding need not quote a specific changed line), but
+  `evidence.rationale` MUST be populated to explain the basis for the finding.
+- Otherwise (i.e., `label_hint` is `issue`, `suggestion`, `nitpick`, `praise`, or
+  `null`), `evidence.quoted_text` is REQUIRED — findings MUST quote the specific
+  line or lines from the diff they reference.
+
 ---
 
 ### Agent 1 — CLAUDE.md Compliance
