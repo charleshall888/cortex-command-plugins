@@ -11,6 +11,9 @@ preconditions:
   - "GitHub CLI (gh) installed and authenticated"
   - "Repository must be a GitHub repo"
   - "If number is omitted, current branch must have an open PR"
+  - "jq available on PATH (macOS: brew install jq)"
+  - "python3 available on PATH (macOS base install sufficient)"
+  - "writable cache directory at ${CLAUDE_SKILL_DIR:-$TMPDIR}/.cache"
 ---
 
 # PR Review

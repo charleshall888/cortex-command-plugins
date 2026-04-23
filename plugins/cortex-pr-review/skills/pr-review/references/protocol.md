@@ -6,6 +6,37 @@ and failure handling instructions.
 
 ---
 
+## Stage 0 — Environment Preflight
+
+Before dispatching any model calls, verify the runtime environment has the tools and
+writable cache directory required by later stages. Stage 0 is cost-graceful: it runs
+three cheap Bash checks and halts immediately with a clear install message on any
+failure. A Stage 0 failure does NOT route to the synthesis-failure fallback — no
+synthesis has been attempted, so the only output is the install-instruction message.
+
+**Preflight check 1 — `jq` available on PATH:**
+```
+command -v jq >/dev/null 2>&1 || { echo "pr-review requires jq. Install: brew install jq"; exit 1; }
+```
+
+**Preflight check 2 — `python3` available on PATH:**
+```
+command -v python3 >/dev/null 2>&1 || { echo "pr-review requires python3 (Stage 3.5 evidence-grounding NFC normalization). python3 is preinstalled on recent macOS."; exit 1; }
+```
+
+**Preflight check 3 — Writable cache directory:**
+Resolve `$CLAUDE_SKILL_DIR` or fall back to `$TMPDIR`. This fallback is non-fatal when
+`$CLAUDE_SKILL_DIR` is unset; only failure to create the cache directory at the
+resolved location is fatal.
+```
+CACHE_DIR="${CLAUDE_SKILL_DIR:-$TMPDIR}/.cache"; mkdir -p "$CACHE_DIR" || { echo "pr-review could not create cache directory $CACHE_DIR"; exit 1; }
+```
+
+**Failure handling:** On any Stage 0 check failure, halt the pipeline immediately and
+surface the install-instruction message verbatim. Do not proceed to Stage 1.
+
+---
+
 ## Stage 1 — Fetch PR Data
 
 Fetch structured metadata and the raw diff for the pull request. When the skill is invoked
