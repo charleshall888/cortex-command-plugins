@@ -475,6 +475,63 @@ historical comment findings; note the gap in the final output.
 
 ---
 
+## Stage 3.5 — Bash Evidence Grounding (pre-step)
+
+After the four Stage 3 critic subagents return and before the Stage 4 synthesizer is
+dispatched, the main agent runs an evidence-grounding pre-step that verifies each
+finding's `quoted_text` actually appears on the correct side of the diff. The pre-step
+is shipped as an external script at
+`plugins/cortex-pr-review/skills/pr-review/scripts/evidence-ground.sh` (inline-heredoc
+is discouraged because the Python NFC one-liner nested inside Bash inside a Stage-3→
+Stage-4 markdown insertion is a triple-escape hazard under reflow).
+
+**Contract.**
+
+- **stdin JSON**: `{critics: {agent1: {findings: [...]}, agent2: {...}, agent3: {...}, agent4: {...}}, diff_path: "<path>"}` where `diff_path` is the absolute path to the unified diff captured in Stage 1.
+- **stdout JSON**: `{grounded: {agent1: {findings: [...]}, ...}, drops: [{finding: {...}, reason: "evidence-not-found" | "evidence-context-mismatch" | "critic-malformed-json", critic: "agentN"}, ...], failed_critics: ["agentN", ...]}`.
+- **stderr**: reserved for diagnostics; the caller MUST redirect to `/dev/null` because the main-agent JSON parse does not tolerate stderr pollution.
+- **Exit codes**: `0` on success (including zero grounded findings — a normal empty-result outcome, not a failure); non-zero on unrecoverable error (diff unreadable, internal logic error).
+- **Timeout**: the script self-terminates after 120 seconds; the caller sets a 150-second timeout on the Bash tool invocation as a safety net.
+- **Matching algorithm** (per finding, ordered):
+  1. Per-critic validation: if critic root JSON is malformed or `findings[]` is missing/non-array, append critic to `failed_critics`, record a `critic-malformed-json` drop, skip its findings.
+  2. If `label_hint ∈ {question, cross-cutting}` AND `quoted_text == null` AND `rationale != null` → pass-through with `matched_side = null`.
+  3. Else normalize `quoted_text` per rubric.md (strip `^[+\- ]`, collapse whitespace runs, CRLF→LF, NFC via `python3 -c 'import sys, unicodedata; sys.stdout.write(unicodedata.normalize("NFC", sys.stdin.read()))'`).
+  4. Normalize `evidence.path` to POSIX forward slashes. `quoted_text` is NEVER slash-normalized.
+  5. Extract `+`, `-`, and ` ` (context) lines from the diff hunk at `evidence.path` within the bounds of `evidence.line_range`, using `@@ -a,b +c,d @@` hunk headers to map post-image line numbers.
+  6. Multi-line `quoted_text` must match consecutive diff lines within a single hunk; cross-hunk → `evidence-context-mismatch`.
+  7. Substring-match priority: `+` line → pass with `matched_side="+"`; `-` line → pass with `matched_side="-"` (synthesizer owns demotion); context-only → fail with `evidence-context-mismatch` (visible drop); no match → fail with `evidence-not-found` (silent drop).
+
+**Severity demotion is NOT performed by this pre-step.** It only records `matched_side`;
+the Stage 4 synthesizer owns any severity adjustment based on that value per `rubric.md`.
+
+**Invocation pattern.** Because the Claude Code Bash tool's command string is bounded
+and must be composed at runtime by the main agent, use the safe-embedding pattern: write
+the critics JSON to a temp file via heredoc (single-quoted delimiter to disable shell
+variable expansion), then compose the pre-step input via `jq` so `quoted_text` content
+is passed through as a JSON string rather than concatenated into the shell command.
+
+```bash
+# Main agent invocation (between Stage 3 and Stage 4).
+# critics_file is produced by writing each critic's findings[] JSON to
+# /tmp/pr-review-critics.json using a heredoc with a single-quoted delimiter.
+# diff_path is the Stage 1 pipeline-state variable.
+jq -nc --slurpfile critics /tmp/pr-review-critics.json \
+       --arg diff_path "$diff_path" \
+       '{critics: $critics[0], diff_path: $diff_path}' \
+  | bash "${CLAUDE_SKILL_DIR:-$TMPDIR}/scripts/evidence-ground.sh" 2>/dev/null
+```
+
+The main agent captures stdout, parses the JSON, and passes `grounded` and `drops` as
+input variables to the Stage 4 dispatch.
+
+**Failure handling.** On any of: non-zero exit, malformed JSON output, empty stdout, or
+stdout exceeding a sanity threshold (~1 MB) → route to the synthesis-failure fallback
+(see Stage 4 failure handling). A successful exit with zero grounded findings is NOT a
+failure — it is a normal empty-findings outcome (Verdict = APPROVE, footer reports
+`0 surfaced, N considered, M dropped`).
+
+---
+
 ## Stage 4 — Opus Synthesis
 
 Launch a fresh subagent using the Opus model. Pass it: the full diff, the PR metadata, the
