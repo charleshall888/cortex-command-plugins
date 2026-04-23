@@ -55,13 +55,17 @@ gh pr view --json title,body,author,files,additions,deletions,changedFiles,headR
 
 **Diff command (with number):**
 ```
-gh pr diff <number> --patch
+diff_path="${CLAUDE_SKILL_DIR:-$TMPDIR}/.cache/pr-<number>.diff"; gh pr diff <number> --patch > "$diff_path"
 ```
 
 **Diff command (no number):**
 ```
-gh pr diff --patch
+diff_path="${CLAUDE_SKILL_DIR:-$TMPDIR}/.cache/pr-<number>.diff"; gh pr diff --patch > "$diff_path"
 ```
+
+The resolved `diff_path` (the absolute filesystem path to the captured diff) is exposed
+as a pipeline-state variable for downstream stages. Stage 0 has already created the
+`${CLAUDE_SKILL_DIR:-$TMPDIR}/.cache` directory, so no `mkdir -p` is required here.
 
 **Failure handling:**
 - If `gh pr view` fails because no PR is associated with the current branch, surface the
