@@ -79,3 +79,39 @@ Evidence-grounding normalization applied before matching `quoted_text` against d
 - Record the matched side (`+`, `-`, or ` `) in `evidence.matched_side` on the finding.
 
 Note: `matched_side` is a rubric-input diagnostic consumed by the Stage 4 synthesizer to decide demotion (e.g., a `-` side match typically demotes an `issue:` to a `question:` or drops it). It is distinct from ticket 005's renderer `side` / `start_side` fields, which map to GitHub's Reviews API request payload.
+
+## Stability test protocol
+
+The rewrite ships only if it produces consistent labels and Verdicts across repeated runs on a fixed PR set. This section defines the methodology; calibration run data itself lives in `calibration-log.md`.
+
+### PR selection criteria
+
+Choose three PRs that span the failure modes the rubric must distinguish:
+
+- One recent merged PR with known nits — exercises the `nitpick:` cap, tie-break, and `signal = high` gating for nits.
+- One recent PR with a real bug (caught in review or post-merge) — exercises `issue (blocking):` detection under `severity = must-fix` AND `solidness ≥ plausible`.
+- One pure refactor PR (no behavior change) — exercises restraint: the rubric should not manufacture `issue:` or `suggestion:` findings when the diff is semantics-preserving.
+
+### 9-run methodology
+
+Run the synthesizer three times per PR across the three selected PRs, for 9 total runs (3 PRs × 3 runs). Each run is independent (fresh context, same inputs). Record the emitted labels and the per-PR Verdict for each run.
+
+### Metrics
+
+- **Label exact-match** — for each PR, count runs where the full set of emitted `(label, quoted_text)` pairs is identical. Reported per PR and aggregated.
+- **Krippendorff's α** — compute on the 3×3 matrix of per-run label assignments (3 runs × 3 PRs), treating labels as nominal categories. α ranges from 0 (chance agreement) to 1 (perfect agreement).
+- **Verdict per-PR exact-match** — for each PR, does the Verdict (approve / request-changes / comment) match across all 3 runs? Reported as `n/3 PRs` with all-3-runs-identical Verdict.
+
+### Ship thresholds
+
+- **Ships**: Krippendorff's α ≥ 0.6 AND Verdict exact-match = 3/3 on ≥ 2/3 PRs.
+- **Blocks**: Krippendorff's α < 0.5 OR majority Verdict exact-match ≤ 1/3 PRs (i.e., 2 or more PRs show Verdict drift across their 3 runs).
+- **Ambiguous (neither ships nor blocks)**: falls between the two — enter the exit ramp below.
+
+### 3-iteration exit ramp
+
+If the first 9-run calibration lands in the ambiguous band, iterate on the rubric (tighten thresholds, clarify axes, adjust caps) and re-run the full 9-run protocol. Allow up to 3 iterations total. Exit conditions:
+
+- **Ship** on any iteration that clears the ship threshold.
+- **Ship-with-warning** after 3 iterations if α ≥ 0.5 AND majority-Verdict-stable (Verdict exact-match = 3/3 on ≥ 2/3 PRs). Record the warning in `calibration-log.md` with the residual instability noted.
+- **Block** after 3 iterations if neither ship nor ship-with-warning conditions hold. Do not ship; return the rewrite to spec.
