@@ -683,6 +683,67 @@ Verdict header plus the flat labeled-finding list.
 
 Follow the voice rules in `output-format.md`: no em-dashes, no AI-tell vocabulary, no
 validation openers, no closing fluff.
+
+## Observability footer
+
+After the flat labeled-finding list, emit an observability footer instantiated with
+live counts from this synthesis pass. Use this exact template, substituting the
+bracketed variables:
+
+    ---
+    _Reviewed by claude-opus-4-7 with {N_critics} critics. {X} findings posted, {Y} dropped._
+
+    <details>
+    <summary>Dropped findings ({visible_Y})</summary>
+
+    | # | Category | Label (would have been) | Reason dropped |
+    |---|----------|------------------------|----------------|
+    | ... | ... | ... | ... |
+
+    </details>
+
+Variable semantics:
+
+- `N_critics` = number of critics whose findings reached you (exclude entries in
+  `failed_critics[]`).
+- `X` = count of surfaced findings in your output (label-prefixed lines above the
+  footer).
+- `Y` = total drops INCLUDING silent `evidence-not-found` drops (grounding misses)
+  AND visible drops (`evidence-context-mismatch`, `low-signal`, `linter-class`,
+  `over-cap`, path-guard rejections).
+- `visible_Y` = drops EXCLUDING `evidence-not-found` — this is the count shown in
+  the `<summary>` and the number of rows populated in the table.
+
+Table constraints:
+
+- Populate one row per visible drop, in the order they were dropped, with columns:
+  row number (1-indexed), `category` field from the dropped finding, the
+  Conventional Comments label the finding would have received had it passed the
+  gate, and the drop reason from the taxonomy.
+- Cap the table at 15 entries. If `visible_Y > 15`, emit the first 15 rows then
+  append an overflow row in the exact form:
+  `| … | … | … | +N more drops of type <breakdown> |`
+  where `N = visible_Y - 15` and `<breakdown>` is a comma-separated count by
+  reason (e.g. `8 low-signal, 3 over-cap`).
+- Total footer body (from the `---` separator through the closing `</details>`)
+  MUST NOT exceed 8192 bytes (8 KB). If the populated table would push the body
+  past the cap, truncate further rows and adjust the overflow row accordingly.
+- Emit the footer as markdown-safe text. The INNER `<details>` wrapping the
+  dropped-findings list is expected; do NOT wrap the entire footer in an outer
+  `<details>` — outer review-body wrapping is owned by a separate stage.
+
+## Synthesis-failure fallback (degraded-mode contract)
+
+If the Opus subagent fails, skip Stage 4 and proceed directly to Stage 5,
+presenting the raw Sonnet outputs with an explanation that synthesis was
+unavailable. This same fallback triggers when the Stage 3.5 pre-step fails in any
+of the following ways: the pre-step exits non-zero, emits malformed JSON on
+stdout, emits empty stdout, or exceeds the 150-second Bash-tool timeout. Any of
+these grounding failure modes routes to the raw-Sonnet presentation path.
+
+Zero findings surviving grounding is NOT a synthesis failure — it is a normal
+empty-findings output (footer reports `0 findings posted, N dropped`;
+Verdict = APPROVE).
 ```
 <!-- END SUBAGENT PROMPT -->
 
